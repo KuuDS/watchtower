@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"os"
+
 	"github.com/distribution/reference"
 )
 
@@ -10,6 +12,16 @@ const (
 	DefaultRegistryHost         = "index.docker.io"
 	LegacyDefaultRegistryDomain = "index.docker.io"
 )
+
+var RegistryMirror string
+
+func init() {
+	if regsitryMirror := os.Getenv("WATCHTOWER_REGISTRY_MIRROR"); regsitryMirror != "" {
+		RegistryMirror = regsitryMirror
+	} else {
+		RegistryMirror = DefaultRegistryHost
+	}
+}
 
 // GetRegistryAddress parses an image name
 // and returns the address of the specified registry
@@ -22,7 +34,7 @@ func GetRegistryAddress(imageRef string) (string, error) {
 	address := reference.Domain(normalizedRef)
 
 	if address == DefaultRegistryDomain {
-		address = DefaultRegistryHost
+		address = RegistryMirror
 	}
 	return address, nil
 }
